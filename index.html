@@ -4,308 +4,7 @@
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Star Spray Pro - Artistic Cityscape</title>
-      <style>
-         html,
-         body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #0d1124;
-         }
-
-         body {
-            cursor: crosshair;
-            transition: background 3s ease-in-out;
-            background: linear-gradient(to bottom, #0d1124 0%, #1a1e3d 100%) no-repeat;
-            background-attachment: fixed;
-         }
-
-         canvas {
-            display: block;
-            background: transparent;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-         }
-
-         body.dawn {
-            background: linear-gradient(to bottom, #231767 0%, #ac5e9b 45%, #ffc4aa 92%) no-repeat;
-            background-attachment: fixed;
-         }
-         body.day {
-            background: linear-gradient(to bottom, #1e90ff 0%, #87cefa 100%) no-repeat;
-            background-attachment: fixed;
-         }
-         body.dusk {
-            background: linear-gradient(to bottom, #450d28 0%, #ff9257 60%, #ffdfac 100%) no-repeat;
-            background-attachment: fixed;
-         }
-         body.night {
-            background: linear-gradient(to bottom, #0d1124 0%, #1a1e3d 100%) no-repeat;
-            background-attachment: fixed;
-         }
-
-         body.dawn g.building3 {
-            fill: #c26698;
-         }
-         body.dawn g.building2 {
-            fill: #a44080;
-         }
-         body.dawn g.building1 {
-            fill: #71245e;
-         }
-
-         body.day g.building3 {
-            fill: #48a7dd;
-         }
-         body.day g.building2 {
-            fill: #347bbe;
-         }
-         body.day g.building1 {
-            fill: #215d96;
-         }
-
-         body.dusk g.building3 {
-            fill: #ed8043;
-         }
-         body.dusk g.building2 {
-            fill: #d95c52;
-         }
-         body.dusk g.building1 {
-            fill: #9f2a47;
-         }
-
-         body.night g.building3 {
-            fill: #2e3a5f;
-         }
-         body.night g.building2 {
-            fill: #1a2444;
-         }
-         body.night g.building1 {
-            fill: #0a0f1e;
-         }
-
-         #ui-hint {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: rgba(255, 255, 255, 0.4);
-            font-family: sans-serif;
-            font-size: 11px;
-            pointer-events: none;
-            z-index: 100;
-            letter-spacing: 2px;
-         }
-
-         #web-ui-panel {
-            position: absolute;
-            top: 50px;
-            left: 20px;
-            background: rgba(13, 17, 36, 0.9);
-            padding: 15px;
-            border-radius: 12px;
-            color: white;
-            font-family: sans-serif;
-            z-index: 110;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: none;
-            width: 200px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-         }
-
-         #web-ui-panel h3 {
-            margin: 0 0 12px 0;
-            font-size: 14px;
-            color: #a5b4fc;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 8px;
-         }
-         .control-group {
-            margin-bottom: 15px;
-         }
-         .control-group label {
-            display: block;
-            font-size: 11px;
-            margin-bottom: 6px;
-            color: #94a3b8;
-         }
-         .control-group input,
-         .control-group select {
-            width: 100%;
-            background: #1e293b;
-            border: 1px solid #334155;
-            color: white;
-            padding: 6px;
-            border-radius: 6px;
-            outline: none;
-         }
-
-         #ui-toggle-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 11px;
-            cursor: pointer;
-            z-index: 120;
-            display: none;
-            transition: all 0.3s ease;
-         }
-         #ui-toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-         }
-
-         #scenery-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-         }
-
-         .scene-svg {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 60vh;
-            transition: opacity 1.5s ease;
-            opacity: 0;
-         }
-
-         .scene-svg.active {
-            opacity: 1;
-         }
-
-         @keyframes window-flicker {
-            0%,
-            100% {
-               opacity: 1;
-            }
-            40% {
-               opacity: 1;
-            }
-            50% {
-               opacity: 0.3;
-            }
-            60% {
-               opacity: 1;
-            }
-         }
-         .win-flicker {
-            animation: window-flicker var(--dur) infinite steps(1);
-         }
-
-         @keyframes drive {
-            from {
-               transform: translateX(-10%);
-            }
-            to {
-               transform: translateX(110%);
-            }
-         }
-         .car-stream {
-            animation: drive var(--speed) linear infinite;
-         }
-         /* 자동차 후미등: 우→좌 */
-         @keyframes drive-reverse {
-            from {
-               transform: translateX(110%);
-            }
-            to {
-               transform: translateX(-10%);
-            }
-         }
-         .car-stream-rev {
-            animation: drive-reverse var(--speed) linear infinite;
-         }
-
-         /* 창문 느린 전원 깜빡임 */
-         @keyframes win-slow-fade {
-            0%,
-            40%,
-            100% {
-               opacity: 1;
-            }
-            45%,
-            95% {
-               opacity: 0;
-            }
-         }
-         .win-slow-fade {
-            animation: win-slow-fade var(--dur) infinite;
-            animation-delay: var(--delay, 0s);
-         }
-
-         /* 가로등 글로우 펄스 */
-         @keyframes lamp-pulse-outer {
-            0%,
-            100% {
-               opacity: 0.08;
-            }
-            50% {
-               opacity: 0.18;
-            }
-         }
-         .lamp-glow-outer {
-            animation: lamp-pulse-outer 3.5s ease-in-out infinite;
-         }
-         @keyframes lamp-pulse {
-            0%,
-            100% {
-               opacity: 0.3;
-            }
-            50% {
-               opacity: 0.55;
-            }
-         }
-         .lamp-glow {
-            animation: lamp-pulse 3.5s ease-in-out infinite;
-         }
-
-         /* 네온 간판 깜빡임 */
-         @keyframes neon-blink {
-            0%,
-            91%,
-            95%,
-            100% {
-               opacity: 0.9;
-            }
-            92%,
-            94% {
-               opacity: 0.08;
-            }
-         }
-         .neon-sign {
-            animation: neon-blink 8s infinite;
-         }
-
-         /* 항공장애등 */
-         @keyframes beacon {
-            0%,
-            49%,
-            100% {
-               opacity: 0;
-            }
-            50%,
-            99% {
-               opacity: 1;
-            }
-         }
-         .beacon-light {
-            animation: beacon 2s step-end infinite;
-         }
-      </style>
+      <link rel="stylesheet" href="./style.css" />
    </head>
    <body class="night">
       <div id="ui-hint">STAR SPRAY PRO | <span id="time-display">Night</span></div>
@@ -336,28 +35,13 @@
             <input type="range" min="1" max="25" value="6" oninput="updateWebConfig('density', parseInt(this.value))" />
          </div>
          <div class="control-group">
-            <button
-               onclick="stars = []"
-               style="
-                  width: 100%;
-                  cursor: pointer;
-                  padding: 8px;
-                  background: #334155;
-                  color: #fff;
-                  border: none;
-                  border-radius: 6px;
-               "
-            >
-               Clear Sky
-            </button>
+            <button class="clear-btn" onclick="stars = []">Clear Stars</button>
          </div>
       </div>
 
       <canvas id="skyCanvas"></canvas>
 
       <div id="scenery-container">
-         <!-- 팁: 여러 SVG 파일의 크기가 다를 경우, 각 레이어를 독립적인 SVG로 감싸고 
-             그 레이어의 원본 viewBox를 기입하면 화면에 꽉 차게 조절됩니다. -->
          <div id="scene-city" class="scene-svg active">
             <!-- 레이어 1: 먼 배경 -->
             <svg
@@ -397,7 +81,7 @@
             <svg
                viewBox="0 0 591.59 106.45"
                preserveAspectRatio="none"
-               style="position: absolute; bottom: -15%; width: 100%; height: 60%"
+               style="position: absolute; bottom: -10%; width: 100%; height: 60%"
             >
                <g class="building1">
                   <path
@@ -415,8 +99,8 @@
                   <circle cx="56" cy="73.5" r="0.85" fill="#fffde7" opacity="1" />
 
                   <!-- 가로등 2 (x=148) -->
-                  <line x1="148" y1="72" x2="148" y2="86" stroke="#99a" stroke-width="0.22" opacity="0.7" />
-                  <line x1="148" y1="72" x2="151.5" y2="70" stroke="#99a" stroke-width="0.22" opacity="0.7" />
+                  <line x1="148" y1="76" x2="148" y2="89" stroke="#99a" stroke-width="0.22" opacity="0.7" />
+                  <line x1="148" y1="76" x2="151.5" y2="70" stroke="#99a" stroke-width="0.22" opacity="0.7" />
                   <circle
                      class="lamp-glow-outer"
                      cx="152"
@@ -438,7 +122,7 @@
                   <circle cx="152" cy="69.5" r="0.85" fill="#fffde7" opacity="1" />
 
                   <!-- 가로등 3 (x=258) -->
-                  <line x1="258" y1="67" x2="258" y2="82" stroke="#99a" stroke-width="0.22" opacity="0.7" />
+                  <line x1="258" y1="67" x2="258" y2="89" stroke="#99a" stroke-width="0.22" opacity="0.7" />
                   <line x1="258" y1="67" x2="261.5" y2="65" stroke="#99a" stroke-width="0.22" opacity="0.7" />
                   <circle
                      class="lamp-glow-outer"
@@ -461,7 +145,7 @@
                   <circle cx="262" cy="64.5" r="0.85" fill="#fffde7" opacity="1" />
 
                   <!-- 가로등 4 (x=368) -->
-                  <line x1="368" y1="70" x2="368" y2="84" stroke="#99a" stroke-width="0.22" opacity="0.7" />
+                  <line x1="368" y1="70" x2="368" y2="89" stroke="#99a" stroke-width="0.22" opacity="0.7" />
                   <line x1="368" y1="70" x2="371.5" y2="68" stroke="#99a" stroke-width="0.22" opacity="0.7" />
                   <circle
                      class="lamp-glow-outer"
@@ -484,7 +168,7 @@
                   <circle cx="372" cy="67.5" r="0.85" fill="#fffde7" opacity="1" />
 
                   <!-- 가로등 5 (x=476) -->
-                  <line x1="476" y1="73" x2="476" y2="87" stroke="#99a" stroke-width="0.22" opacity="0.7" />
+                  <line x1="476" y1="73" x2="476" y2="89" stroke="#99a" stroke-width="0.22" opacity="0.7" />
                   <line x1="476" y1="73" x2="479.5" y2="71" stroke="#99a" stroke-width="0.22" opacity="0.7" />
                   <circle
                      class="lamp-glow-outer"
@@ -507,7 +191,7 @@
                   <circle cx="480" cy="70.5" r="0.85" fill="#fffde7" opacity="1" />
 
                   <!-- ─── 네온 간판 ─── -->
-                  <rect class="neon-sign" x="108" y="60" width="9" height="1.1" rx="0.3" fill="#f472b6" opacity="0.9" />
+                  <!-- <rect class="neon-sign" x="108" y="60" width="9" height="1.1" rx="0.3" fill="#f472b6" opacity="0.9" />
                   <rect
                      class="neon-sign"
                      x="318"
@@ -529,7 +213,7 @@
                      fill="#fb923c"
                      opacity="0.9"
                      style="animation-delay: -5.7s"
-                  />
+                  /> -->
 
                   <!-- ─── 항공장애등 (고층 건물 꼭대기) ─── -->
                   <circle class="beacon-light" cx="125" cy="37" r="1" fill="#ef4444" opacity="0.95" />
@@ -553,57 +237,44 @@
                   />
 
                   <!-- ─── 자동차 전조등 (좌→우, 흰색) ─── -->
+                  <rect class="car-stream" x="0" y="85" width="15" height="0.8" fill="#ffffff" style="--speed: 8s" />
                   <rect
                      class="car-stream"
                      x="0"
-                     y="89.2"
-                     width="20"
-                     height="0.9"
-                     fill="#ffffff"
-                     opacity="0.70"
-                     style="--speed: 14s"
-                  />
-                  <rect
-                     class="car-stream"
-                     x="0"
-                     y="88.5"
-                     width="13"
+                     y="84"
+                     width="10"
                      height="0.6"
                      fill="#dbeafe"
-                     opacity="0.50"
-                     style="--speed: 22s; animation-delay: -8s"
+                     style="--speed: 12s; animation-delay: -4s"
                   />
                   <rect
                      class="car-stream"
                      x="0"
-                     y="89.8"
-                     width="17"
+                     y="86"
+                     width="12"
                      height="0.7"
                      fill="#ffffff"
-                     opacity="0.40"
-                     style="--speed: 31s; animation-delay: -19s"
+                     style="--speed: 15s; animation-delay: -10s"
                   />
 
                   <!-- ─── 자동차 후미등 (우→좌, 빨간색) ─── -->
                   <rect
                      class="car-stream-rev"
                      x="0"
-                     y="92.5"
-                     width="16"
-                     height="0.9"
+                     y="85"
+                     width="12"
+                     height="0.8"
                      fill="#ef4444"
-                     opacity="0.65"
-                     style="--speed: 17s; animation-delay: -5s"
+                     style="--speed: 10s; animation-delay: -2s"
                   />
                   <rect
                      class="car-stream-rev"
                      x="0"
-                     y="93.2"
-                     width="11"
+                     y="86"
+                     width="8"
                      height="0.6"
                      fill="#dc2626"
-                     opacity="0.45"
-                     style="--speed: 26s; animation-delay: -12s"
+                     style="--speed: 14s; animation-delay: -7s"
                   />
                </g>
                <g id="window-lights"></g>
@@ -622,299 +293,6 @@
          </svg>
       </div>
 
-      <script>
-         const canvas = document.getElementById('skyCanvas');
-         const ctx = canvas.getContext('2d');
-         const timeDisplay = document.getElementById('time-display');
-         const webUiPanel = document.getElementById('web-ui-panel');
-         const uiToggleBtn = document.getElementById('ui-toggle-btn');
-         let width, height;
-         let stars = [];
-         let meteors = [];
-         let bassIntensity = 0;
-         let globalStarOpacityMultiplier = 1.0;
-
-         let config = {
-            density: 6,
-            radius: 35,
-            maxStars: 20000,
-            fpsLimit: 60,
-            enableMusic: true,
-            starColor: '#ffffff',
-            sceneType: 'city',
-         };
-
-         let lastFrameTime = 0;
-         let isSpraying = false;
-         let mouseX = 0,
-            mouseY = 0;
-
-         const STAR_COLORS = ['#ffedd5', '#fee2e2', '#e0f2fe', '#fef9c3', '#ffffff'];
-
-         function generateWindows() {
-            const container = document.getElementById('window-lights');
-            container.innerHTML = '';
-
-            // building1 viewBox(0 0 591.59 106.45) 기준 실루엣 구역
-            // top = 건물 꼭대기 y좌표, bottom = 지붕 끝 y좌표 (도로 직전 ~82)
-            const buildingZones = [
-               { x: 0, w: 25, top: 44, bottom: 81 },
-
-               { x: 61, w: 30, top: 33, bottom: 81 },
-               { x: 92, w: 12, top: 50, bottom: 81 },
-
-               { x: 121, w: 15, top: 40, bottom: 81 },
-               { x: 137, w: 12, top: 52, bottom: 81 },
-
-               { x: 186, w: 19, top: 20, bottom: 81 }, // 깃발 우측
-
-               { x: 215, w: 12, top: 35, bottom: 81 },
-               { x: 233, w: 8, top: 32, bottom: 81 },
-               { x: 241, w: 9, top: 31, bottom: 81 },
-               { x: 257, w: 12, top: 24, bottom: 81 },
-
-               { x: 275, w: 28, top: 11, bottom: 81 }, // 중앙 건물
-
-               { x: 320, w: 12, top: 47, bottom: 81 },
-
-               { x: 341, w: 38, top: 33, bottom: 81 }, // 아래랑 세트
-               { x: 380, w: 25, top: 33, bottom: 81 }, // 위랑 세트
-
-               { x: 450, w: 38, top: 48, bottom: 81 },
-               { x: 500, w: 33, top: 57, bottom: 81 },
-               { x: 545, w: 40, top: 54, bottom: 81 },
-            ];
-
-            const WIN_W = 1.0; // 창문 너비 (SVG 좌표 기준)
-            const WIN_H = 1.0; // 창문 높이
-            const COL_GAP = 2.8; // 창문 열 간격
-            const ROW_GAP = 3.2; // 창문 행 간격
-
-            buildingZones.forEach((zone) => {
-               const cols = Math.floor(zone.w / COL_GAP);
-               const rows = Math.floor((zone.bottom - zone.top) / ROW_GAP);
-
-               for (let c = 0; c < cols; c++) {
-                  for (let r = 0; r < rows; r++) {
-                     if (Math.random() > 0.38) {
-                        // 62% 확률로 불 켜짐
-                        const winX = zone.x + c * COL_GAP + Math.random() * 0.5;
-                        const winY = zone.top + r * ROW_GAP + Math.random() * 1.0;
-
-                        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                        rect.setAttribute('x', winX);
-                        rect.setAttribute('y', winY);
-                        rect.setAttribute('width', WIN_W);
-                        rect.setAttribute('height', WIN_H);
-
-                        // 색상 다양화: 노랑(warm), 하늘(cool), 흰색
-                        const rand = Math.random();
-                        let color = '#fef08a';
-                        if (rand > 0.82) color = '#ffffff';
-                        else if (rand > 0.7) color = '#bae6fd';
-                        else if (rand > 0.62) color = '#fde68a';
-
-                        const baseOpacity = Math.random() * 0.55 + 0.35;
-                        rect.setAttribute('fill', color);
-                        rect.setAttribute('opacity', baseOpacity);
-
-                        // 깜빡임 효과 분기
-                        const fx = Math.random();
-                        if (fx > 0.9) {
-                           // 빠른 전기 깜빡임
-                           rect.classList.add('win-flicker');
-                           rect.style.setProperty('--dur', Math.random() * 3 + 2 + 's');
-                        } else if (fx > 0.82) {
-                           // 느린 전원 ON/OFF (불 켜고 끄는 느낌)
-                           rect.classList.add('win-slow-fade');
-                           rect.style.setProperty('--dur', Math.random() * 8 + 6 + 's');
-                           rect.style.setProperty('--delay', -(Math.random() * 10) + 's');
-                        }
-
-                        container.appendChild(rect);
-                     }
-                  }
-               }
-            });
-         }
-
-         function updateWebConfig(key, value) {
-            config[key] = value;
-            if (key === 'sceneType') updateScenery();
-         }
-
-         function updateTimeContext() {
-            const hour = new Date().getHours();
-            const buildings3 = document.querySelectorAll('.building3');
-            const buildings2 = document.querySelector('.building2');
-            const buildings1 = document.querySelector('.building1');
-
-            let label = 'Night',
-               bClass = 'night',
-               starMult = 1.0;
-
-            if (hour >= 5 && hour < 8) {
-               label = 'Dawn';
-               bClass = 'dawn';
-               starMult = 0.5;
-            } else if (hour >= 8 && hour < 17) {
-               label = 'Day';
-               bClass = 'day';
-               starMult = 0.1;
-            } else if (hour >= 17 && hour < 20) {
-               label = 'Dusk';
-               bClass = 'dusk';
-               starMult = 0.6;
-            }
-
-            document.body.className = bClass;
-            timeDisplay.innerText = label;
-            globalStarOpacityMultiplier = starMult;
-         }
-
-         function updateScenery() {
-            document.querySelectorAll('.scene-svg').forEach((el) => el.classList.remove('active'));
-            if (config.sceneType !== 'none') {
-               const activeScene = document.getElementById(`scene-${config.sceneType}`);
-               if (activeScene) activeScene.classList.add('active');
-            }
-         }
-
-         class Star {
-            constructor(x, y) {
-               this.x = x;
-               this.y = y;
-               const isLarge = Math.random() > 0.95;
-               this.size = isLarge ? Math.random() * 1.2 + 0.6 : Math.random() * 0.4 + 0.1;
-               this.color = isLarge ? STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)] : '#fff';
-               this.baseOpacity = Math.random() * 0.7 + 0.2;
-               this.blinkSpeed = Math.random() * 0.03 + 0.01;
-               this.angle = Math.random() * Math.PI * 2;
-               this.isLarge = isLarge;
-            }
-            update() {
-               this.angle += this.blinkSpeed;
-               const reaction = config.enableMusic ? bassIntensity * 0.5 : 0;
-               this.opacity = (this.baseOpacity + Math.sin(this.angle) * 0.2 + reaction) * globalStarOpacityMultiplier;
-            }
-            draw() {
-               if (this.opacity < 0.05) return;
-               ctx.save();
-               ctx.globalAlpha = Math.min(1, this.opacity);
-               ctx.fillStyle = this.color;
-               const s = this.isLarge ? this.size + bassIntensity * 2 : this.size;
-               ctx.beginPath();
-               ctx.arc(this.x, this.y, s, 0, Math.PI * 2);
-               if (this.isLarge && globalStarOpacityMultiplier > 0.5) {
-                  ctx.shadowBlur = s * 8;
-                  ctx.shadowColor = this.color;
-               }
-               ctx.fill();
-               ctx.restore();
-            }
-         }
-
-         class Meteor {
-            constructor() {
-               this.reset();
-            }
-            reset() {
-               this.x = Math.random() * width;
-               this.y = Math.random() * (height * 0.4);
-               this.len = Math.random() * 100 + 50;
-               this.speed = Math.random() * 15 + 10;
-               this.opacity = 1;
-               this.active = false;
-               this.wait = Math.random() * 1200 + 400;
-            }
-            update() {
-               if (globalStarOpacityMultiplier < 0.3) return;
-               if (!this.active) {
-                  if (--this.wait <= 0) this.active = true;
-                  return;
-               }
-               this.x += this.speed;
-               this.y += this.speed * 0.5;
-               this.opacity -= 0.015;
-               if (this.opacity <= 0) this.reset();
-            }
-            draw() {
-               if (!this.active) return;
-               ctx.strokeStyle = `rgba(255,255,255,${this.opacity * globalStarOpacityMultiplier})`;
-               ctx.lineWidth = 1.5;
-               ctx.beginPath();
-               ctx.moveTo(this.x, this.y);
-               ctx.lineTo(this.x - this.len, this.y - this.len * 0.5);
-               ctx.stroke();
-            }
-         }
-
-         function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            if (meteors.length === 0) for (let i = 0; i < 3; i++) meteors.push(new Meteor());
-         }
-
-         function animate(timestamp) {
-            const elapsed = timestamp - lastFrameTime;
-            if (elapsed > 1000 / config.fpsLimit) {
-               lastFrameTime = timestamp;
-               ctx.clearRect(0, 0, width, height);
-               if (isSpraying) {
-                  for (let i = 0; i < config.density; i++) {
-                     const a = Math.random() * Math.PI * 2,
-                        r = Math.sqrt(Math.random()) * config.radius;
-                     stars.push(new Star(mouseX + Math.cos(a) * r, mouseY + Math.sin(a) * r));
-                  }
-                  if (stars.length > config.maxStars) stars.splice(0, config.density);
-               }
-               stars.forEach((s) => {
-                  s.update();
-                  s.draw();
-               });
-               meteors.forEach((m) => {
-                  m.update();
-                  m.draw();
-               });
-            }
-            requestAnimationFrame(animate);
-         }
-
-         window.onload = () => {
-            resize();
-            updateTimeContext();
-            updateScenery();
-            generateWindows();
-
-            if (!window.wallpaperRegisterAudioListener) {
-               webUiPanel.style.display = 'block';
-               uiToggleBtn.style.display = 'block';
-            } else {
-               window.wallpaperRegisterAudioListener((audio) => {
-                  let sum = 0;
-                  for (let i = 0; i < 10; i++) sum += audio[i];
-                  bassIntensity = sum / 10;
-               });
-            }
-
-            uiToggleBtn.onclick = () =>
-               (webUiPanel.style.display = webUiPanel.style.display === 'none' ? 'block' : 'none');
-            window.onresize = resize;
-            window.onmousedown = (e) => {
-               if (e.target.tagName === 'CANVAS') isSpraying = true;
-               mouseX = e.clientX;
-               mouseY = e.clientY;
-            };
-            window.onmouseup = () => (isSpraying = false);
-            window.onmousemove = (e) => {
-               mouseX = e.clientX;
-               mouseY = e.clientY;
-            };
-
-            requestAnimationFrame(animate);
-         };
-      </script>
+      <script src="./script.js"></script>
    </body>
 </html>
