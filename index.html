@@ -9,6 +9,11 @@
    <body class="night">
       <div id="ui-hint">STAR SPRAY PRO | <span id="time-display">Night</span></div>
 
+      <div id="moon-container">
+         <!-- JS에서 달 모양을 동적으로 그릴 SVG -->
+         <svg id="moon-svg" viewBox="0 0 100 100"></svg>
+      </div>
+
       <button id="ui-toggle-btn">Settings</button>
       <div id="web-ui-panel">
          <h3>Environment Settings</h3>
@@ -40,6 +45,12 @@
       </div>
 
       <canvas id="skyCanvas"></canvas>
+
+      <div id="event-modal">
+         <h2>🌠 Meteor Caught!</h2>
+         <p>You caught a shooting star.<br />Make a wish upon the sky.</p>
+         <button onclick="closeModal()">Make a Wish</button>
+      </div>
 
       <div id="scenery-container">
          <div id="scene-city" class="scene-svg active">
@@ -191,7 +202,7 @@
                   <circle cx="480" cy="70.5" r="0.85" fill="#fffde7" opacity="1" />
 
                   <!-- ─── 네온 간판 ─── -->
-                  <!-- <rect class="neon-sign" x="108" y="60" width="9" height="1.1" rx="0.3" fill="#f472b6" opacity="0.9" />
+                  <rect class="neon-sign" x="108" y="60" width="9" height="1.1" rx="0.3" fill="#f472b6" opacity="0.9" />
                   <rect
                      class="neon-sign"
                      x="318"
@@ -213,15 +224,15 @@
                      fill="#fb923c"
                      opacity="0.9"
                      style="animation-delay: -5.7s"
-                  /> -->
+                  />
 
                   <!-- ─── 항공장애등 (고층 건물 꼭대기) ─── -->
-                  <circle class="beacon-light" cx="125" cy="37" r="1" fill="#ef4444" opacity="0.95" />
+                  <circle class="beacon-light" cx="125" cy="37" r="0.7" fill="#ef4444" opacity="0.95" />
                   <circle
                      class="beacon-light"
                      cx="283"
                      cy="2"
-                     r="1"
+                     r="0.8"
                      fill="#ef4444"
                      opacity="0.95"
                      style="animation-delay: -1s"
@@ -230,7 +241,7 @@
                      class="beacon-light"
                      cx="390"
                      cy="20"
-                     r="0.8"
+                     r="0.7"
                      fill="#ef4444"
                      opacity="0.9"
                      style="animation-delay: -0.5s"

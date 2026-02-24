@@ -3,6 +3,9 @@ const ctx = canvas.getContext('2d');
 const timeDisplay = document.getElementById('time-display');
 const webUiPanel = document.getElementById('web-ui-panel');
 const uiToggleBtn = document.getElementById('ui-toggle-btn');
+const moonContainer = document.getElementById('moon-container');
+const modal = document.getElementById('event-modal');
+
 let width, height;
 let stars = [];
 let meteors = [];
@@ -33,37 +36,37 @@ function generateWindows() {
    // building1 viewBox(0 0 591.59 106.45) 기준 실루엣 구역
    // top = 건물 꼭대기 y좌표, bottom = 지붕 끝 y좌표 (도로 직전 ~82)
    const buildingZones = [
-      { x: 0, w: 25, top: 44, bottom: 85 },
+      { x: 0, w: 25, top: 44, bottom: 87 },
 
-      { x: 61, w: 30, top: 33, bottom: 85 },
-      { x: 92, w: 12, top: 50, bottom: 85 },
+      { x: 61, w: 30, top: 33, bottom: 87 },
+      { x: 92, w: 12, top: 50, bottom: 87 },
 
-      { x: 121, w: 15, top: 40, bottom: 85 },
-      { x: 137, w: 12, top: 52, bottom: 85 },
+      { x: 121, w: 15, top: 40, bottom: 87 },
+      { x: 137, w: 12, top: 52, bottom: 87 },
 
-      { x: 186, w: 19, top: 20, bottom: 85 }, // 깃발 우측
+      { x: 186, w: 19, top: 20, bottom: 87 }, // 깃발 우측
 
-      { x: 215, w: 12, top: 35, bottom: 85 },
-      { x: 233, w: 8, top: 32, bottom: 85 },
-      { x: 241, w: 9, top: 31, bottom: 85 },
-      { x: 257, w: 12, top: 24, bottom: 85 },
+      { x: 215, w: 12, top: 35, bottom: 87 },
+      { x: 233, w: 8, top: 32, bottom: 87 },
+      { x: 241, w: 9, top: 31, bottom: 87 },
+      { x: 257, w: 12, top: 24, bottom: 87 },
 
-      { x: 275, w: 28, top: 11, bottom: 85 }, // 중앙 건물
+      { x: 275, w: 28, top: 11, bottom: 87 }, // 중앙 건물
 
-      { x: 320, w: 12, top: 47, bottom: 85 },
+      { x: 320, w: 12, top: 47, bottom: 87 },
 
-      { x: 341, w: 38, top: 33, bottom: 85 }, // 아래랑 세트
-      { x: 380, w: 25, top: 33, bottom: 85 }, // 위랑 세트
+      { x: 341, w: 38, top: 33, bottom: 87 }, // 아래랑 세트
+      { x: 380, w: 23, top: 33, bottom: 87 }, // 위랑 세트
 
-      { x: 450, w: 38, top: 48, bottom: 85 },
-      { x: 500, w: 33, top: 57, bottom: 85 },
-      { x: 545, w: 40, top: 54, bottom: 85 },
+      { x: 450, w: 38, top: 48, bottom: 87 },
+      { x: 500, w: 33, top: 57, bottom: 87 },
+      { x: 545, w: 40, top: 54, bottom: 87 },
    ];
 
-   const WIN_W = 1.0; // 창문 너비 (SVG 좌표 기준)
-   const WIN_H = 1.0; // 창문 높이
-   const COL_GAP = 2.8; // 창문 열 간격
-   const ROW_GAP = 3.2; // 창문 행 간격
+   const WIN_W = 0.7; // 창문 너비 (SVG 좌표 기준)
+   const WIN_H = 0.7; // 창문 높이
+   const COL_GAP = 1.8; // 창문 열 간격
+   const ROW_GAP = 2.5; // 창문 행 간격
 
    buildingZones.forEach((zone) => {
       const cols = Math.floor(zone.w / COL_GAP);
@@ -126,25 +129,30 @@ function updateTimeContext() {
 
    let label = 'Night',
       bClass = 'night',
-      starMult = 1.0;
+      starMult = 1.0,
+      moonOp = 1;
 
    if (hour >= 5 && hour < 8) {
       label = 'Dawn';
       bClass = 'dawn';
       starMult = 0.5;
+      moonOp = 0.4;
    } else if (hour >= 8 && hour < 17) {
       label = 'Day';
       bClass = 'day';
       starMult = 0.1;
+      moonOp = 0.1;
    } else if (hour >= 17 && hour < 20) {
       label = 'Dusk';
       bClass = 'dusk';
       starMult = 0.6;
+      moonOp = 0.5;
    }
 
    document.body.className = bClass;
    timeDisplay.innerText = label;
    globalStarOpacityMultiplier = starMult;
+   moonContainer.style.opacity = moonOp;
 }
 
 function updateScenery() {
@@ -153,6 +161,30 @@ function updateScenery() {
       const activeScene = document.getElementById(`scene-${config.sceneType}`);
       if (activeScene) activeScene.classList.add('active');
    }
+   moonContainer.style.display = config.sceneType === 'city' ? 'block' : 'none';
+}
+
+// 1. 달 모양 계산 및 그리기
+function drawMoon() {
+   const moonSvg = document.getElementById('moon-svg');
+   const now = new Date();
+   // 간단한 월령 계산 (근사치: 29.5일 주기)
+   const dayOfCycle = (now.getDate() + now.getMonth() * 30) % 29.5;
+   const phase = dayOfCycle / 29.5; // 0~1 사이값
+
+   let path = '';
+   if (phase < 0.5) {
+      // 초승달 -> 보름달 가는 중
+      const curve = 100 - phase * 400;
+      path = `M50,0 A50,50 0 1,1 50,100 A${Math.abs(curve)},50 0 1,${curve > 0 ? 0 : 1} 50,0`;
+   } else {
+      // 보름달 -> 그믐달 가는 중
+      const p = phase - 0.5;
+      const curve = -100 + p * 400;
+      path = `M50,0 A50,50 0 1,0 50,100 A${Math.abs(curve)},50 0 1,${curve > 0 ? 1 : 0} 50,0`;
+   }
+
+   moonSvg.innerHTML = `<path d="${path}" fill="#fef3c7" />`;
 }
 
 class Star {
@@ -196,11 +228,12 @@ class Meteor {
    reset() {
       this.x = Math.random() * width;
       this.y = Math.random() * (height * 0.4);
-      this.len = Math.random() * 100 + 50;
-      this.speed = Math.random() * 15 + 10;
+      this.len = Math.random() * 100 + 60;
+      this.speed = Math.random() * 12 + 8;
       this.opacity = 1;
       this.active = false;
-      this.wait = Math.random() * 1200 + 400;
+      this.wait = Math.random() * 1000 + 500;
+      this.hitRadius = 45;
    }
    update() {
       if (globalStarOpacityMultiplier < 0.3) return;
@@ -209,18 +242,23 @@ class Meteor {
          return;
       }
       this.x += this.speed;
-      this.y += this.speed * 0.5;
-      this.opacity -= 0.015;
-      if (this.opacity <= 0) this.reset();
+      this.y += this.speed * 0.45;
+      this.opacity -= 0.013;
+      if (this.opacity <= 0 || this.x > width + 100) this.reset();
    }
    draw() {
       if (!this.active) return;
+      ctx.save();
       ctx.strokeStyle = `rgba(255,255,255,${this.opacity * globalStarOpacityMultiplier})`;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'white';
       ctx.beginPath();
       ctx.moveTo(this.x, this.y);
-      ctx.lineTo(this.x - this.len, this.y - this.len * 0.5);
+      ctx.lineTo(this.x - this.len, this.y - this.len * 0.45);
       ctx.stroke();
+      ctx.restore();
    }
 }
 
@@ -230,6 +268,11 @@ function resize() {
    canvas.width = width;
    canvas.height = height;
    if (meteors.length === 0) for (let i = 0; i < 3; i++) meteors.push(new Meteor());
+}
+
+function closeModal() {
+   modal.classList.remove('active');
+   setTimeout(() => (modal.style.display = 'none'), 300);
 }
 
 function animate(timestamp) {
@@ -259,6 +302,7 @@ function animate(timestamp) {
 
 window.onload = () => {
    resize();
+   drawMoon();
    updateTimeContext();
    updateScenery();
    generateWindows();
@@ -276,7 +320,23 @@ window.onload = () => {
 
    uiToggleBtn.onclick = () => (webUiPanel.style.display = webUiPanel.style.display === 'none' ? 'block' : 'none');
    window.onresize = resize;
+
    window.onmousedown = (e) => {
+      // UI 클릭 방지
+      if (e.target.closest('#web-ui-panel') || e.target.closest('#event-modal')) return;
+
+      // 별똥별 클릭 감지
+      meteors.forEach((m) => {
+         if (m.active) {
+            const dist = Math.hypot(m.x - e.clientX, m.y - e.clientY);
+            if (dist < m.hitRadius) {
+               m.reset();
+               modal.style.display = 'block';
+               setTimeout(() => modal.classList.add('active'), 10);
+            }
+         }
+      });
+
       if (e.target.tagName === 'CANVAS') isSpraying = true;
       mouseX = e.clientX;
       mouseY = e.clientY;
